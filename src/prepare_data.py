@@ -1,3 +1,12 @@
+"""
+prepare_data.py — Dataset extraction script.
+
+Extracts the dataset.zip archive (placed in src/) into data/raw/.
+Run once before launching the notebook:
+
+    python src/prepare_data.py
+"""
+
 import zipfile
 from pathlib import Path
 
