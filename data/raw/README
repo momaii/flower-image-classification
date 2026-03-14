@@ -1,5 +1,17 @@
 # Raw data
 
-This folder contains raw downloaded datasets.
+Ce dossier contient les images extraites du dataset.
 
-⚠️ Files are not versioned.
+⚠️ Les fichiers ne sont pas versionnés (ignorés par Git).
+
+## Obtenir les données
+
+Télécharger `dataset.zip` via le lien disponible dans le README principal,
+le placer dans `src/`, puis exécuter :
+
+```bash
+python src/prepare_data.py
+```
+
+Les images seront extraites ici, réparties en sous-dossiers par classe :
+`0/`, `2/`, `4/`, `9/`
