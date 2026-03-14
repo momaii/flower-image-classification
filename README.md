@@ -42,6 +42,13 @@ Ce projet explore :
 - Optimisation avec Adam  
 - Early Stopping  
 
+## Dataset
+
+- **320 images** réparties en **4 classes** (labels : 0, 2, 4, 9)
+- Split : **256 images d'entraînement / 64 images de validation**
+- Taille des images : **128×128 pixels**
+- Augmentation : flips horizontaux, rotations (±10%), zoom (±10%)
+
 ## Évaluation
 
 Les modèles sont évalués via :  
@@ -61,48 +68,40 @@ Ces résultats confirment qu’en régime de données limité, le transfert d’
 
 ## Structure du projet
 
-flower-image-classification/  
-│  
-├── data/  
-│   ├── assets/              # Image test (ex: test.jpg)  
-│   └── raw/                 # Dataset extrait (classes 0,2,4,9...)
-│                    
-├── notebooks/  
-│   └── flower_images_classification.ipynb  
-│  
-├── src/  
-│   ├── prepare_data.py  
-│   ├── dataset.zip          # Archive des données (non versionnée)  
-│   └── __pycache__/         # Ignoré par git  
-│  
-├── requirements.txt  
-├── requirements-lock.txt  
-├── .gitignore  
-└── README.md  
+```
+flower-image-classification/
+├── data/
+│   ├── assets/              # Image de test
+│   └── raw/                 # Dataset extrait (classes 0, 2, 4, 9)
+├── notebooks/
+│   └── flower_images_classification.ipynb
+├── src/
+│   └── prepare_data.py      # Script d’extraction du dataset
+├── requirements.txt
+├── requirements-lock.txt
+├── .gitignore
+└── README.md
+```
 
 ## Installation
 
-Cloner le dépôt :
-
-git clone <repo_url>  
-cd flower-image-classification  
-
-Créer un environnement virtuel :
-
-python -m venv .venv  
-source .venv/bin/activate  # Mac / Linux  
-
-Installer les dépendances :
-
-pip install -r requirements.txt  
+```bash
+git clone https://github.com/salomefonvielle/flower-image-classification
+cd flower-image-classification
+python -m venv .venv
+source .venv/bin/activate  # Mac / Linux
+pip install -r requirements.txt
+```
 
 ## Données
 
-Placer le fichier dataset.zip dans le dossier src/, puis exécuter le script d’extraction :
+Placer le fichier `dataset.zip` dans le dossier `src/`, puis exécuter :
 
-from src.prepare_data import extract_zip  
+```python
+from src.prepare_data import extract_zip
+```
 
-Les images seront extraites dans data/raw/jpg/.
+Les images seront extraites dans `data/raw/`.
 
 ## Remarques
 
