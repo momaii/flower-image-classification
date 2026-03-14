@@ -76,7 +76,9 @@ flower-image-classification/
 ├── notebooks/
 │   └── flower_images_classification.ipynb
 ├── src/
-│   └── prepare_data.py      # Script d’extraction du dataset
+│   ├── prepare_data.py      # Extraction du dataset (ZIP → data/raw/)
+│   ├── models.py            # Définitions des modèles (CNN v1, CNN v2, DenseNet121)
+│   └── evaluate.py          # Utilitaires d’évaluation (courbes, matrice de confusion)
 ├── requirements.txt
 ├── requirements-lock.txt
 ├── .gitignore
