@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.metrics import confusion_matrix, classification_report
 
 
@@ -61,8 +62,22 @@ def evaluate_model(model, val_ds, class_names: list[str]) -> None:
         y_true.extend(labels.numpy())
         y_pred.extend(np.argmax(preds, axis=1))
 
-    print("Confusion Matrix:")
-    print(confusion_matrix(y_true, y_pred))
-    print()
+    cm = confusion_matrix(y_true, y_pred)
+
+    plt.figure(figsize=(6, 5))
+    sns.heatmap(
+        cm,
+        annot=True,
+        fmt="d",
+        cmap="Blues",
+        xticklabels=class_names,
+        yticklabels=class_names,
+    )
+    plt.title("Confusion Matrix")
+    plt.ylabel("True label")
+    plt.xlabel("Predicted label")
+    plt.tight_layout()
+    plt.show()
+
     print("Classification Report:")
     print(classification_report(y_true, y_pred, target_names=class_names))
