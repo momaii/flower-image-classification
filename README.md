@@ -80,7 +80,6 @@ flower-image-classification/
 │   ├── models.py            # Définitions des modèles (CNN v1, CNN v2, DenseNet121)
 │   └── evaluate.py          # Utilitaires d’évaluation (courbes, matrice de confusion)
 ├── requirements.txt
-├── requirements-lock.txt
 ├── .gitignore
 └── README.md
 ```
@@ -99,11 +98,13 @@ pip install -r requirements.txt
 
 Placer le fichier `dataset.zip` dans le dossier `src/`, puis exécuter :
 
-```python
-from src.prepare_data import extract_zip
+```bash
+python src/prepare_data.py
 ```
 
 Les images seront extraites dans `data/raw/`.
+
+> Le fichier `dataset.zip` et le dossier `data/raw/` ne sont pas versionnés.
 
 ## Remarques
 

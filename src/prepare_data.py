@@ -5,9 +5,9 @@ from pathlib import Path
 # Configuration
 # ==============================
 
-PROJECT_ROOT = Path(__file__).parent
-DATA_ZIP = PROJECT_ROOT / "src"/"dataset.zip"
-DATA_DIR = PROJECT_ROOT / "data"/ "raw"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DATA_ZIP = PROJECT_ROOT / "src" / "dataset.zip"
+DATA_DIR = PROJECT_ROOT / "data" / "raw"
 
 
 # ==============================
