@@ -96,6 +96,8 @@ pip install -r requirements.txt
 
 ## Données
 
+Le dataset est disponible ici : [Télécharger dataset.zip](https://drive.google.com/file/d/1Gkmnb_-XRPSV7K0OIIkT9qTUg-UncGJ6/view?usp=drive_link)
+
 Placer le fichier `dataset.zip` dans le dossier `src/`, puis exécuter :
 
 ```bash
