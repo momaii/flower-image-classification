@@ -1,23 +1,11 @@
-"""
-Model definitions for flower image classification.
-
-Two architectures are provided:
-- build_cnn_v1 / build_cnn_v2 : custom CNNs trained from scratch
-- build_densenet             : DenseNet121 transfer learning model
-"""
-
 import tensorflow as tf
 from tensorflow.keras import layers, models, Model, Input
 from tensorflow.keras.applications import DenseNet121
 from tensorflow.keras.applications.densenet import preprocess_input
 
 
-# ---------------------------------------------------------------------------
-# Shared data augmentation pipelines
-# ---------------------------------------------------------------------------
-
-def get_augmentation_v1() -> tf.keras.Sequential:
-    """Light augmentation used in CNN v1."""
+# Augmentation légère pour CNN v1
+def get_augmentation_v1():
     return tf.keras.Sequential([
         layers.RandomFlip("horizontal"),
         layers.RandomRotation(0.1),
@@ -25,8 +13,8 @@ def get_augmentation_v1() -> tf.keras.Sequential:
     ], name="augmentation_v1")
 
 
-def get_augmentation_v2() -> tf.keras.Sequential:
-    """Stronger augmentation used in CNN v2."""
+# Augmentation plus forte pour CNN v2 (lutte contre le surapprentissage)
+def get_augmentation_v2():
     return tf.keras.Sequential([
         layers.RandomFlip("horizontal"),
         layers.RandomRotation(0.2),
@@ -35,27 +23,18 @@ def get_augmentation_v2() -> tf.keras.Sequential:
     ], name="augmentation_v2")
 
 
-# ---------------------------------------------------------------------------
-# CNN trained from scratch — v1 (VGG-style, ~1.28 M params)
-# ---------------------------------------------------------------------------
-
-def build_cnn_v1(num_classes: int = 4) -> models.Sequential:
-    """
-    VGG-style CNN with 4 convolutional blocks (64 → 128 → 256 → 256 filters).
-
-    Blocks 1 and 2 use two consecutive convolutions before pooling to increase
-    receptive field depth. Blocks 3 and 4 use a single convolution.
-    Global Average Pooling replaces Flatten to reduce parameter count and
-    limit overfitting in a low-data regime.
-
-    ~1.28 M trainable parameters.
+def build_cnn_v1(num_classes=4):
+    """CNN from scratch, style VGG, ~1.28M paramètres.
+    4 blocs convolutionnels (64 -> 128 -> 256 -> 256 filtres).
+    Blocs 1 et 2 : deux convolutions successives avant pooling.
+    Global Average Pooling à la place de Flatten pour réduire le surapprentissage.
     """
     return models.Sequential([
         layers.Input(shape=(128, 128, 3)),
         layers.Rescaling(1.0 / 255),
         get_augmentation_v1(),
 
-        # Block 1 — 64 filters × 2
+        # Bloc 1 — 64 filtres x2
         layers.Conv2D(64, (3, 3), padding="same"),
         layers.BatchNormalization(),
         layers.Activation("relu"),
@@ -64,7 +43,7 @@ def build_cnn_v1(num_classes: int = 4) -> models.Sequential:
         layers.Activation("relu"),
         layers.MaxPooling2D(),
 
-        # Block 2 — 128 filters × 2
+        # Bloc 2 — 128 filtres x2
         layers.Conv2D(128, (3, 3), padding="same"),
         layers.BatchNormalization(),
         layers.Activation("relu"),
@@ -73,13 +52,13 @@ def build_cnn_v1(num_classes: int = 4) -> models.Sequential:
         layers.Activation("relu"),
         layers.MaxPooling2D(),
 
-        # Block 3 — 256 filters × 1
+        # Bloc 3 — 256 filtres
         layers.Conv2D(256, (3, 3), padding="same"),
         layers.BatchNormalization(),
         layers.Activation("relu"),
         layers.MaxPooling2D(),
 
-        # Block 4 — 256 filters × 1
+        # Bloc 4 — 256 filtres
         layers.Conv2D(256, (3, 3), padding="same"),
         layers.BatchNormalization(),
         layers.Activation("relu"),
@@ -92,48 +71,36 @@ def build_cnn_v1(num_classes: int = 4) -> models.Sequential:
     ], name="cnn_v1")
 
 
-# ---------------------------------------------------------------------------
-# CNN trained from scratch — v2 (reduced capacity, stronger regularisation)
-# ---------------------------------------------------------------------------
-
-def build_cnn_v2(
-    num_classes: int = 4,
-    learning_rate: float = 1e-4,
-) -> models.Sequential:
-    """
-    Revised CNN with reduced capacity and stronger regularisation to reduce
-    overfitting in a low-data regime.
-
-    Each block uses a single convolution. The dense head is halved (256 units)
-    and a lower learning rate is used. ReduceLROnPlateau is recommended during
-    training.
-
-    ~1.03 M trainable parameters.
+def build_cnn_v2(num_classes=4, learning_rate=1e-4):
+    """CNN v2 : capacité réduite + régularisation renforcée par rapport à v1.
+    Un seul bloc convolutionnel par niveau, tête Dense réduite (256 unités),
+    learning rate plus faible. Meilleure généralisation sur données limitées.
+    ~1.03M paramètres.
     """
     model = models.Sequential([
         layers.Input(shape=(128, 128, 3)),
         layers.Rescaling(1.0 / 255),
         get_augmentation_v2(),
 
-        # Block 1
+        # Bloc 1
         layers.Conv2D(64, (3, 3), padding="same"),
         layers.BatchNormalization(),
         layers.Activation("relu"),
         layers.MaxPooling2D(),
 
-        # Block 2
+        # Bloc 2
         layers.Conv2D(128, (3, 3), padding="same"),
         layers.BatchNormalization(),
         layers.Activation("relu"),
         layers.MaxPooling2D(),
 
-        # Block 3
+        # Bloc 3
         layers.Conv2D(256, (3, 3), padding="same"),
         layers.BatchNormalization(),
         layers.Activation("relu"),
         layers.MaxPooling2D(),
 
-        # Block 4
+        # Bloc 4
         layers.Conv2D(256, (3, 3), padding="same"),
         layers.BatchNormalization(),
         layers.Activation("relu"),
@@ -153,24 +120,10 @@ def build_cnn_v2(
     return model
 
 
-# ---------------------------------------------------------------------------
-# Transfer learning — DenseNet121 (frozen backbone)
-# ---------------------------------------------------------------------------
-
-def build_densenet(num_classes: int = 4) -> Model:
-    """
-    DenseNet121 feature extractor with a lightweight classification head.
-
-    The backbone is loaded with ImageNet weights and kept fully frozen.
-    Only the Dense + Dropout head is trained, limiting the number of
-    trainable parameters to ~263 K while benefiting from rich pretrained
-    visual representations.
-
-    Args:
-        num_classes: Number of output classes (default 4).
-
-    Returns:
-        Compiled Keras Model.
+def build_densenet(num_classes=4):
+    """Transfert d'apprentissage avec DenseNet121 pré-entraîné sur ImageNet.
+    Backbone gelé (feature extractor uniquement), tête de classification légère.
+    Seule la tête est entraînée (~263K paramètres entraînables).
     """
     base_model = DenseNet121(
         include_top=False,
